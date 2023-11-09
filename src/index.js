@@ -18,10 +18,14 @@ const setUpAndStartServer = async () => {
 
   app.set("view engine", "ejs");
 
-  app.get("/chat/:roomId", (req, res) => {
+  app.get("/chat/:roomId", async (req, res) => {
+    const chats = await Chat.find({
+      roomId: req.params.roomId,
+    }).select("content user");
+
     res.render("index", {
-      name: "Mouli",
       id: req.params.roomId,
+      chats: chats,
     });
   });
 
