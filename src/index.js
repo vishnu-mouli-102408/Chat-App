@@ -8,6 +8,7 @@ import { Server } from "socket.io";
 import http from "http";
 
 import path from "path";
+import Chat from "./models/chat.js";
 
 const __dirname = path.resolve();
 
@@ -32,11 +33,18 @@ const setUpAndStartServer = async () => {
       socket.join(data.roomId);
     });
 
-    socket.on("msg_sent", (data) => {
+    socket.on("msg_sent", async (data) => {
       // console.log(data);
       // io.emit("msg_rcvd", data); // sends data to all web socket connections
       //   socket.emit("msg_rcvd", data); // doesnt send data to other web socket connections, only sends to itself.
       //   socket.broadcast.emit("msg_rcvd", data); // except itself, sends the data to all web socket connections/
+
+      const chat = await Chat.create({
+        roomId: data.roomId,
+        content: data.msg,
+        user: data.username,
+      });
+
       io.to(data.roomId).emit("msg_rcvd", data);
     });
   });
